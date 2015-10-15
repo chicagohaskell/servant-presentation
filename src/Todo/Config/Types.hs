@@ -1,0 +1,3 @@
+module
+
+data Config = Config
