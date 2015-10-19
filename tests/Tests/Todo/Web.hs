@@ -2,12 +2,12 @@
 {-# LANGUAGE OverloadedStrings #-}
 ------------------------------------------------------------------------------
 -- |
--- Module      : Test.Web.Todo
+-- Module      : Test.Todo.Web
 -- Stability   : experimental
 -- Portability : POSIX
 --
 ------------------------------------------------------------------------------
-module Test.Web.Todo ( todoWebTests ) where
+module Tests.Todo.Web ( todoWebTests ) where
 ------------------------------------------------------------------------------
 import           Control.Arrow
 import           Control.Monad
@@ -51,4 +51,32 @@ todoWebTests = do
       Right User{..} <- makeUser
       Right todos <- runEitherT $ todoGetAll token Nothing Nothing
       todos `shouldBe` []
+   it "Should create a todo" $ do
+      Right User { token = token } <- makeUser
+      x <- runEitherT $ todoCreate token (NewTodo "walk dog")
+      x `shouldSatisfy` isRight
+      Right (TodoCount count) <- runEitherT $ todoCount token
+      count `shouldBe` 1
+      Right todos <- runEitherT $ todoGetAll token Nothing Nothing
+      length todos `shouldBe` 1
+   it "Should update a todo" $ do
+      Right User { token = token } <- makeUser
+      Right Todo { todoId = todoId } <- runEitherT $ todoCreate token (NewTodo "walk dog")
+      Right (Just Todo { description = description }) <-
+        runEitherT $ todoUpdate token todoId (NewTodo "eat")
+      description `shouldBe` Description "eat"
+   it "Should delete a todo" $ do
+      Right User { token = token } <- makeUser
+      Right Todo { todoId = todoId } <- runEitherT $ todoCreate token (NewTodo "walk dog")
+      Right () <- runEitherT $ todoDelete token todoId 
+      Right (TodoCount count) <- runEitherT $ todoCount token
+      count `shouldBe` 2
+
+
+   
+
+
+
+
+
 

@@ -12,7 +12,7 @@ module Main ( main ) where
 ------------------------------------------------------------------------------
 import Todo.API                             ( API )
 import Todo.App
-import Todo.Config         
+import Todo.Config
 import Servant.Server
 import Data.Proxy
 import System.Envy

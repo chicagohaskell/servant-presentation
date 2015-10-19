@@ -11,12 +11,15 @@
 module Main where
 ------------------------------------------------------------------------------
 import GHC.Conc
+import Control.Monad
+import System.Envy
 import Test.Hspec
 import Network.Wai.Handler.Warp ( run )
 ------------------------------------------------------------------------------
 import Todo.App              ( app  )
+import Todo.Config
 ------------------------------------------------------------------------------
-import Todo.Test.Web
+import Tests.Todo.Web
 ------------------------------------------------------------------------------
 -- | Testing main
 main :: IO ()
@@ -25,13 +28,13 @@ main = hspec spec
 -- | Spec
 spec :: Spec
 spec = do
-  config <- runIO $ do
-    getConfig >>= \case
-      Left err -> error (show err)
-      Right c -> do
-        _ <- forkIO $ run 8000 (app c)
-        threadDelay 1000000 -- one second
-        return c
+  runIO $ do
+    result <- decodeEnv
+    case result of
+       Left errMsg -> print errMsg
+       Right config@Config{..} -> do
+          void $ forkIO $ run 8000 (app config)
+          threadDelay 1000000 -- one second
   describe "Web Tests" $
-    todoTests config
-    
+    todoWebTests
+

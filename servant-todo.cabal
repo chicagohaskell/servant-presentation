@@ -116,6 +116,7 @@ test-suite tests
                        , time
                        , timeit
                        , transformers
+                       , servant-todo
                        , unordered-containers
                        , uuid
                        , wai
@@ -124,5 +125,5 @@ test-suite tests
     ghc-options:       -Wall -rtsopts -threaded -funbox-strict-fields
     default-language:  Haskell2010
     other-modules:
-      Todo.Test.Util
+      Tests.Todo.Web
 
