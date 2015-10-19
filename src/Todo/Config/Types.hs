@@ -1,3 +1,0 @@
-module
-
-data Config = Config
