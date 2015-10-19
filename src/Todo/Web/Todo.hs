@@ -33,6 +33,7 @@ import           Network.Wai.Internal
 import           Network.Wai
 import           Network.HTTP.Types
 import           Servant.Client
+import           Servant.Mock
 import           Servant.Common.Req
 import qualified Web.JWT as JWT
 import           Servant.Common.Text
@@ -88,6 +89,9 @@ instance HasClient api => HasClient (AuthToken :> api) where
     clientWithRoute (Proxy :: Proxy api) newreq url 
       where
         newreq = req { headers = [("X-Access-Token", txt)] ++ (headers req) }
+
+instance HasMock api => HasMock (AuthToken :> api) where
+  mock _ = const $ mock (Proxy :: Proxy api)
 
 instance HasServer api => HasServer (AuthToken :> api) where
   type ServerT (AuthToken :> api) m = UserId -> ServerT api m

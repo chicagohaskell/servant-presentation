@@ -8,6 +8,7 @@ import qualified Data.Text as T
 import           Data.Text    (Text)
 import           GHC.Generics
 import           Test.QuickCheck.Arbitrary
+import           Test.QuickCheck.Instances
 import           Control.Monad.IO.Class ( MonadIO(..) )
 import           Data.UUID (UUID)
 import           Data.Hashable
@@ -16,16 +17,16 @@ import           Servant.Common.Text
 import           Todo.Type.UUID
 ------------------------------------------------------------------------------
 newtype UserId = UserId TodoUUID
-  deriving (Show, FromText, ToText, Arbitrary, ToJSON, FromJSON, Eq, Hashable)
+  deriving (Show, FromText, ToText, ToJSON, FromJSON, Eq, Hashable, Arbitrary)
 ------------------------------------------------------------------------------
 newtype UserName = UserName Text
-  deriving (Show, FromText, ToText, ToJSON, FromJSON, Eq, Hashable)
+  deriving (Show, FromText, ToText, ToJSON, FromJSON, Eq, Hashable, Arbitrary)
 ------------------------------------------------------------------------------
 newtype Password = Password Text
-  deriving (Show, FromText, ToText, ToJSON, FromJSON, Eq)
+  deriving (Show, FromText, ToText, ToJSON, FromJSON, Eq, Arbitrary)
 ------------------------------------------------------------------------------
 newtype AuthToken = AuthToken Text
-  deriving (Show, FromText, ToText, ToJSON, FromJSON, Eq)
+  deriving (Show, FromText, ToText, ToJSON, FromJSON, Eq, Arbitrary)
 ------------------------------------------------------------------------------
 data LoginUser = LoginUser {
      user :: UserName
@@ -44,3 +45,6 @@ data User = User {
 ------------------------------------------------------------------------------
 instance ToJSON User
 instance FromJSON User
+------------------------------------------------------------------------------
+instance Arbitrary User where
+  arbitrary = User <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
