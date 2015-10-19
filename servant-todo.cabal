@@ -10,7 +10,7 @@ category:            Web
 build-type:          Simple
 cabal-version:       >=1.10
 description:         Todo application written in Servant
-                     
+
 executable web
   main-is:             Main.hs
   hs-source-dirs:      exe
@@ -19,9 +19,8 @@ executable web
                      , aeson
                      , bytestring
                      , envy
-                     , servant-mock
+                     , stm
                      , servant-todo
-                     , hedis
                      , transformers
                      , transformers-base
                      , monad-control
@@ -33,12 +32,14 @@ executable web
                      , mtl
                      , servant-server
                      , servant-docs
---                   , servant-swagger
                      , QuickCheck
                      , quickcheck-instances
                      , text
                      , time
                      , uuid
+                     , http-types
+                     , unordered-containers
+                     , hashable
                      , wai
                      , warp
   default-language:    Haskell2010
@@ -50,10 +51,10 @@ library
                      , aeson
                      , bytestring
                      , envy
+                     , stm
                      , servant-client
                      , random
                      , mtl
-                     , hedis
                      , jwt
                      , transformers
                      , transformers-base
@@ -63,9 +64,11 @@ library
                      , either
                      , servant-server
                      , servant-docs
---                   , servant-swagger
                      , QuickCheck
                      , quickcheck-instances
+                     , http-types
+                     , unordered-containers
+                     , hashable
                      , text
                      , time
                      , uuid
@@ -76,8 +79,6 @@ library
     Todo.App
     Todo.Core
     Todo.Config
-    Todo.Config.Auth
-    Todo.Config.Redis
     Todo.DB.Todo
     Todo.DB.User
     Todo.Web.Todo
@@ -87,4 +88,41 @@ library
     Todo.Type.Error
     Todo.Type.User
     Todo.Type.UUID
+
+test-suite tests
+    type:              exitcode-stdio-1.0
+    main-is:           Main.hs
+    hs-source-dirs:    tests
+    build-depends:       QuickCheck
+                       , aeson
+                       , attoparsec
+                       , aws
+                       , base
+                       , bytestring
+                       , containers
+                       , either
+                       , hspec
+                       , hspec-core
+                       , jwt
+                       , monad-control
+                       , mtl
+                       , quickcheck-instances
+                       , random
+                       , servant
+                       , servant-client
+                       , servant-server
+                       , split
+                       , text
+                       , time
+                       , timeit
+                       , transformers
+                       , unordered-containers
+                       , uuid
+                       , wai
+                       , wai-extra
+                       , warp
+    ghc-options:       -Wall -rtsopts -threaded -funbox-strict-fields
+    default-language:  Haskell2010
+    other-modules:
+      Todo.Test.Util
 

@@ -10,9 +10,10 @@ import           Test.QuickCheck
 import qualified Data.UUID as UUID
 import qualified Data.UUID.V4 as UUID
 import           Data.UUID (UUID)
+import           Data.Hashable
 
 newtype TodoUUID = TodoUUID UUID
-  deriving (Show, Eq)
+  deriving (Show, Eq, Hashable)
 
 instance ToJSON TodoUUID where
     toJSON = String . toText

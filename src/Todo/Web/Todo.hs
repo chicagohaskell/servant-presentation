@@ -10,7 +10,7 @@
 -- Module      : Todo.Web.Todo
 -- Stability   : experimental
 -- Portability : POSIX
--- 
+--
 ------------------------------------------------------------------------------
 module Todo.Web.Todo
     ( -- * Todo API
@@ -19,56 +19,78 @@ module Todo.Web.Todo
     , todoAPI
     ) where
 ------------------------------------------------------------------------------
-import           Servant 
+import           Servant
+import qualified Data.Text as T
+import           Data.Text    (Text)
+import           Servant.Server.Internal
+import           Control.Monad.Reader
 import qualified Data.Text.Encoding as T
 import qualified Data.Text as T
 import           Data.Text    (Text)
 import           Control.Monad.Except
+import           Control.Monad.Trans.Maybe
 import           Network.Wai.Internal
+import           Network.Wai
+import           Network.HTTP.Types
 import qualified Web.JWT as JWT
 ------------------------------------------------------------------------------
 import           Todo.Core
+import           Todo.Config
 import           Todo.Type.Todo
+import           Todo.Type.User
 import           Todo.DB.Todo
 ------------------------------------------------------------------------------
 -- | Comment API
 type TodoAPI =
-       "todo" :> Capture "id" TodoId :> Get '[JSON] Todo
-       -- curl -XGET /todo/:id 
-  :<|> "todo" :> "count" :> Get '[JSON] TodoCount
-       -- curl -XGET /todo/ 
-  :<|> "todo" :> QueryParam "orderby" OrderBy
-              :> QueryParam "completed" Completed
-              :> Get '[JSON] [Todo]
-       -- curl -XGET /todo?desc?completed
-  :<|> "todo" :> ReqBody '[JSON] NewTodo :> Post '[JSON] Todo
-       -- curl -XPOST /todo/:id, -d { "body" : "walk dog" }
-  :<|> "todo" :> Capture "id" TodoId  :> Delete '[JSON] ()
-       -- curl -XDELETE /todo/:id
-  :<|> "todo" :> Capture "id" TodoId :> ReqBody '[JSON] NewTodo :> Put '[JSON] Todo
-       -- curl -XPUT /todo/:id, Body = { "body" : "walk cat" }, returning Todo
+       AuthToken :> "todo" :> QueryParam "orderby" OrderBy :> QueryParam "completed" Completed :> Get '[JSON] [Todo]
+  :<|> AuthToken :> "todo" :> Capture "id" TodoId :> Get '[JSON] (Maybe Todo)
+  :<|> AuthToken :> "todo" :> Capture "id" TodoId :> Delete '[JSON] ()
+  :<|> AuthToken :> "todo" :> Capture "id" TodoId :> ReqBody '[JSON] NewTodo :> Put '[JSON] (Maybe Todo)
+  :<|> AuthToken :> "todo" :> "count" :> Get '[JSON] TodoCount
+  :<|> AuthToken :> "todo" :> ReqBody '[JSON] NewTodo :> Post '[JSON] Todo
+
 ------------------------------------------------------------------------------
 todoAPI :: ServerT TodoAPI TodoApp
-todoAPI = todoGet
-     :<|> todoCount
-     :<|> todoGetAll
-     :<|> todoCreate
+todoAPI = todoGetAll
+     :<|> todoGet
      :<|> todoDelete
      :<|> todoUpdate
+     :<|> todoCount
+     :<|> todoCreate
 ------------------------------------------------------------------------------
-todoGet = undefined
-todoCount = undefined
-todoGetAll = undefined
-todoCreate = undefined
-todoDelete = undefined
-todoUpdate = undefined
+todoGet :: UserId -> TodoId -> TodoApp (Maybe Todo)
+todoGet uid todoId = getTodo uid todoId =<< asks tododb
 
--- data JWT = JWT Text
+todoCount :: UserId -> TodoApp TodoCount
+todoCount uid = getTodoCount uid =<< asks tododb
 
--- instance HasServer api => HasServer (JWT :> api) where
---   type ServerT (JWT :> api) m = JWT -> ServerT api m
---   route Proxy subServer req@Request{..} resp =
---     case lookup "X-Access-Token" requestHeaders of
---       Nothing -> undefined
---       Just x  ->
---         route (Proxy :: Proxy api) (subServer (JWT (T.decodeUtf8 x))) req resp
+todoGetAll :: UserId -> Maybe OrderBy -> Maybe Completed -> TodoApp [Todo]
+todoGetAll uid _ _ = getTodos uid =<< asks tododb
+
+todoCreate :: UserId -> NewTodo -> TodoApp Todo
+todoCreate uid newtodo = do
+  todo <- newTodoToTodo newtodo uid
+  addTodo uid todo =<< asks tododb
+
+todoDelete :: UserId -> TodoId -> TodoApp ()
+todoDelete uid todoid = deleteTodo uid todoid =<< asks tododb
+
+todoUpdate :: UserId -> TodoId -> NewTodo -> TodoApp (Maybe Todo)
+todoUpdate uid todoid newtodo = updateTodo uid todoid newtodo =<< asks tododb
+
+data AuthToken
+
+instance HasServer api => HasServer (AuthToken :> api) where
+  type ServerT (AuthToken :> api) m = UserId -> ServerT api m
+  route Proxy subServer req@Request{..} resp =
+    case getKey req of
+      Nothing -> the401
+      Just userid -> route (Proxy :: Proxy api) (subServer userid) req resp
+   where
+     the401 = resp . succeedWith $ responseLBS status401 [] "Invalid or missing Token"
+     getKey :: Request -> Maybe UserId
+     getKey Request{..} = do
+       key <- lookup "X-Access-Token" requestHeaders
+       sub <- JWT.sub . JWT.claims <$>
+                 JWT.decodeAndVerifySignature (JWT.secret "secret") (T.decodeUtf8 key)
+       fromText =<< JWT.stringOrURIToText <$> sub

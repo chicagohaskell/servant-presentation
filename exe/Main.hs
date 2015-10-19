@@ -11,10 +11,10 @@
 module Main ( main ) where
 ------------------------------------------------------------------------------
 import Todo.API                             ( API )
+import Todo.App
 import Todo.Config         
 import Servant.Server
 import Data.Proxy
-import Servant.Mock
 import System.Envy
 import Network.Wai.Handler.Warp             ( run )
 ------------------------------------------------------------------------------
@@ -27,9 +27,6 @@ main = do
     Left errMsg -> print errMsg
     Right config@Config{..} -> do
       putStrLn $ "Running server on " ++ show port ++ "..."
-      run port $ serve api (mock api)
+      run port (app config)
 
---          run port (app config)
-
-      
 

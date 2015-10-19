@@ -5,6 +5,7 @@
 module Todo.Type.Todo where
 ------------------------------------------------------------------------------
 import           Data.Aeson
+import           Data.Hashable
 import           Data.Text (Text)
 import qualified Data.Text as T
 import           Data.UUID (UUID)
@@ -52,15 +53,15 @@ instance FromText OrderBy where
   fromText "desc" = pure Desc
 
 newtype TodoId = TodoId TodoUUID
-   deriving (Show, Eq, FromText, ToText, FromJSON, ToJSON, Arbitrary)
+   deriving (Show, Eq, FromText, ToText, FromJSON, ToJSON, Arbitrary, Hashable)
 
 data Todo = Todo {
     userId      :: UserId
-  , todoId      :: TodoId  
+  , todoId      :: TodoId
   , created     :: Created
   , completed   :: Completed
   , description :: Description
-  } deriving (Show, Generic)
+  } deriving (Show, Generic, Eq)
 
 instance Arbitrary Todo where
   arbitrary =
