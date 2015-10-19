@@ -42,14 +42,9 @@ import           Todo.DB.User
 ------------------------------------------------------------------------------
 -- | Comment API
 type UserAPI = "user" :> ReqBody '[JSON] LoginUser :> Post '[JSON] User
-           :<|> "user" :> "hi" :> Get '[JSON] Value
 ------------------------------------------------------------------------------
 userAPI :: ServerT UserAPI TodoApp
-userAPI = loginUser :<|> hi
+userAPI user = getUser user =<< asks userdb
 
-
-loginUser user = getUser user =<< asks userdb
-
-hi = return $ object ["ay" .= ("yo" :: Text) ]
 
 

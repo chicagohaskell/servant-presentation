@@ -32,7 +32,10 @@ import           Control.Monad.Trans.Maybe
 import           Network.Wai.Internal
 import           Network.Wai
 import           Network.HTTP.Types
+import           Servant.Client
+import           Servant.Common.Req
 import qualified Web.JWT as JWT
+import           Servant.Common.Text
 ------------------------------------------------------------------------------
 import           Todo.Core
 import           Todo.Config
@@ -57,6 +60,7 @@ todoAPI = todoGetAll
      :<|> todoUpdate
      :<|> todoCount
      :<|> todoCreate
+
 ------------------------------------------------------------------------------
 todoGet :: UserId -> TodoId -> TodoApp (Maybe Todo)
 todoGet uid todoId = getTodo uid todoId =<< asks tododb
@@ -78,7 +82,12 @@ todoDelete uid todoid = deleteTodo uid todoid =<< asks tododb
 todoUpdate :: UserId -> TodoId -> NewTodo -> TodoApp (Maybe Todo)
 todoUpdate uid todoid newtodo = updateTodo uid todoid newtodo =<< asks tododb
 
-data AuthToken
+instance HasClient api => HasClient (AuthToken :> api) where
+  type Client (AuthToken :> api) = AuthToken -> Client api
+  clientWithRoute Proxy req url (AuthToken txt) =
+    clientWithRoute (Proxy :: Proxy api) newreq url 
+      where
+        newreq = req { headers = [("X-Access-Token", txt)] ++ (headers req) }
 
 instance HasServer api => HasServer (AuthToken :> api) where
   type ServerT (AuthToken :> api) m = UserId -> ServerT api m

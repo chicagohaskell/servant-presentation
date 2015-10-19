@@ -45,5 +45,5 @@ registerUser LoginUser {..} = liftIO $ do
   let userName = user
       password = pass
   userId <- UserId <$> nextUUID
-  token  <- Token <$> createToken userId 
+  token  <- AuthToken <$> createToken userId 
   return User{..}

@@ -9,49 +9,46 @@
 ------------------------------------------------------------------------------
 module Test.Web.Todo ( todoWebTests ) where
 ------------------------------------------------------------------------------
+import           Control.Arrow
 import           Control.Monad
 import           Control.Monad.Trans.Either
 import           Data.Proxy
+import           Data.Either
 import           Servant hiding (Post)
 import           Servant.Client
 import           Test.Hspec
 import qualified Web.JWT as JWT
+import           Todo.Type.User
+import           Todo.Type.Todo
+import           Todo.API
 ------------------------------------------------------------------------------
 -- | Proxification
-todoApi :: Proxy TodoAPI
-todoApi = Proxy
-------------------------------------------------------------------------------
--- | Sigs
-todoDELETE :: TodoId  -> Maybe JWT.JSON -> EitherT ServantError IO ()
-todoGET    :: PostId     -> Maybe TimeStamp -> Maybe Limit -> Maybe JWT.JSON
-              -> EitherT ServantError IO [Todo]
-todoPOST   :: NewTodo -> Maybe JWT.JSON -> EitherT ServantError IO Todo
-------------------------------------------------------------------------------
+api :: Proxy API
+api = Proxy
+---------------------------------------------------------------
 -- | Client Handlers
-todoPOST :<|> todoGET :<|> todoDELETE = client todoApi host
-  where host = BaseUrl Http "localhost" 8000
+createUser
+     :<|> todoGetAll
+     :<|> todoGet
+     :<|> todoDelete
+     :<|> todoUpdate
+     :<|> todoCount
+     :<|> todoCreate = client api host
+  where
+    host = BaseUrl Http "localhost" 8000
 ------------------------------------------------------------------------------
 -- | Plus One Tests
-todoWebTests :: Config -> SpecWith ()
-todoWebTests config = do
-  describe "Todo web tests" $ do
-   void $ runIO $ runApp config $ redis flushall
-   Right (token, uid) <- runIO $ regUser config
-   it "Should create / delete a todo" $ do
-    np <- newPost
-    Right Post { postId = pid } <-
-      runEitherT $ postPOST np (Just token)
-    let nc = newTodo pid
-    kk <- runEitherT $ todoPOST nc (Just token)
-    let Right res@Todo{..} = kk
-    todoPostId `shouldBe` pid
-    todoUid `shouldBe` uid
-    todoDeleted `shouldBe` False
-    cc <- runEitherT $ postGETTodoCount pid (Just token)
-    cc `shouldBe` Right (TodoCount pid 1)
-    Right [res2] <- runEitherT $ todoGET pid Nothing Nothing (Just token)
-    res `shouldBe` res2
-    void $ runEitherT $ todoDELETE todoId (Just token)
-    Right [ Todo { todoDeleted = del' } ] <-
-      runEitherT $ todoGET pid Nothing Nothing (Just token)
-    del' `shouldBe` True
+todoWebTests :: SpecWith ()
+todoWebTests = do
+   let makeUser = runEitherT $ createUser $ LoginUser (UserName "test") (Password "foo")
+   it "Should create a user" $
+     (`shouldSatisfy` isRight) =<< makeUser
+   it "Should return 0 on initial todo count" $ do
+      Right User{..} <- makeUser
+      Right (TodoCount count) <- runEitherT $ todoCount token
+      count `shouldBe` 0
+   it "Should return an empty list with no todos" $ do
+      Right User{..} <- makeUser
+      Right todos <- runEitherT $ todoGetAll token Nothing Nothing
+      todos `shouldBe` []
+

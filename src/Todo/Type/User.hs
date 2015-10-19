@@ -24,7 +24,7 @@ newtype UserName = UserName Text
 newtype Password = Password Text
   deriving (Show, FromText, ToText, ToJSON, FromJSON, Eq)
 ------------------------------------------------------------------------------
-newtype Token = Token Text
+newtype AuthToken = AuthToken Text
   deriving (Show, FromText, ToText, ToJSON, FromJSON, Eq)
 ------------------------------------------------------------------------------
 data LoginUser = LoginUser {
@@ -38,7 +38,7 @@ instance FromJSON LoginUser
 data User = User {
     userName :: UserName
   , userId   :: UserId
-  , token    :: Token
+  , token    :: AuthToken
   , password :: Password
   } deriving (Show, Eq, Generic)
 ------------------------------------------------------------------------------
