@@ -20,7 +20,6 @@ module Todo.App
        ) where
 ------------------------------------------------------------------------------
 import Control.Monad.Reader
-import Control.Concurrent.Lifted
 import Control.Monad.Trans.Either
 import Servant
 import Network.Wai                 ( Application )

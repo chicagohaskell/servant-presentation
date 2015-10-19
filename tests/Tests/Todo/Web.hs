@@ -9,18 +9,13 @@
 ------------------------------------------------------------------------------
 module Tests.Todo.Web ( todoWebTests ) where
 ------------------------------------------------------------------------------
-import           Control.Arrow
-import           Control.Monad
 import           Control.Monad.Trans.Either
-import           Data.Proxy
 import           Data.Either
 import           Servant hiding (Post)
 import           Servant.Client
 import           Test.Hspec
-import qualified Web.JWT as JWT
 import           Todo.Type.User
 import           Todo.Type.Todo
-import           Todo.API
 ------------------------------------------------------------------------------
 -- | Proxification
 api :: Proxy API

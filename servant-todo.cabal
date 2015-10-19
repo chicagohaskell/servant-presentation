@@ -20,16 +20,14 @@ executable web
                      , bytestring
                      , envy
                      , stm
-                     , servant-todo
                      , transformers
-                     , transformers-base
-                     , monad-control
                      , servant
-                     , lifted-base
                      , either
                      , jwt
                      , random
                      , mtl
+                     , servant-todo
+                     , servant-mock
                      , servant-server
                      , servant-docs
                      , QuickCheck
@@ -52,16 +50,14 @@ library
                      , bytestring
                      , envy
                      , stm
-                     , servant-client
                      , random
                      , mtl
                      , jwt
                      , transformers
-                     , transformers-base
-                     , monad-control
                      , servant
-                     , lifted-base
                      , either
+                     , servant-mock
+                     , servant-client
                      , servant-server
                      , servant-docs
                      , QuickCheck
@@ -103,11 +99,10 @@ test-suite tests
                        , either
                        , hspec
                        , hspec-core
-                       , jwt
-                       , monad-control
                        , mtl
                        , quickcheck-instances
                        , random
+                       , envy
                        , servant
                        , servant-client
                        , servant-server

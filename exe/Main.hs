@@ -12,7 +12,6 @@ module Main ( main ) where
 ------------------------------------------------------------------------------
 import Todo.API                             ( API )
 import Todo.App
-import Todo.Config
 import System.Environment
 import Servant.Server
 import Servant.Mock
