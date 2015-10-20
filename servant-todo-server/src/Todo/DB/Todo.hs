@@ -13,6 +13,7 @@ import Data.Maybe
 import Todo.Type.Todo
 import Todo.Type.User
 import Todo.Type.UUID
+import Todo.DB.User (nextUUID)
 import Data.Time.Clock.POSIX
 
 newtype TodoDB = TodoDB {

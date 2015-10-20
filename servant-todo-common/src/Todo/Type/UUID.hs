@@ -36,6 +36,3 @@ instance ToText TodoUUID where
 
 instance FromText TodoUUID where
   fromText x = TodoUUID <$> UUID.fromText x
-
--- nextUUID :: MonadIO m => m TodoUUID
--- nextUUID = TodoUUID <$> liftIO UUID.nextRandom

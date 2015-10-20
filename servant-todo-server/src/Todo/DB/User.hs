@@ -16,6 +16,7 @@ import Todo.Type.Todo
 import Todo.Type.User
 import Todo.Type.UUID
 import Data.Time.Clock.POSIX
+import Data.UUID.V4 as UUID
 import Servant.Common.Text
 
 newtype UserDB = UserDB {
@@ -28,7 +29,7 @@ createToken (UserId uid) = do
       claim = JWT.def {
       JWT.sub = JWT.stringOrURI (toText uid)
     }
-  return $ JWT.encodeSigned JWT.HS256 (JWT.secret "secret") claim 
+  return $ JWT.encodeSigned JWT.HS256 (JWT.secret "secret") claim
 
 getUser :: MonadIO m => LoginUser -> TVar UserDB -> m User
 getUser lu@LoginUser{..} tvar = liftIO $ do
@@ -41,9 +42,12 @@ getUser lu@LoginUser{..} tvar = liftIO $ do
      return u
 
 registerUser :: MonadIO m => LoginUser -> m User
-registerUser LoginUser {..} = liftIO $ do 
+registerUser LoginUser {..} = liftIO $ do
   let userName = user
       password = pass
   userId <- UserId <$> nextUUID
-  token  <- AuthToken <$> createToken userId 
+  token  <- AuthToken <$> createToken userId
   return User{..}
+
+nextUUID :: MonadIO m => m TodoUUID
+nextUUID = TodoUUID <$> liftIO UUID.nextRandom
