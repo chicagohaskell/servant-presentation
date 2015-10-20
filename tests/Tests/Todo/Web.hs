@@ -14,6 +14,7 @@ import           Data.Either
 import           Servant hiding (Post)
 import           Servant.Client
 import           Test.Hspec
+import           Todo.API
 import           Todo.Type.User
 import           Todo.Type.Todo
 ------------------------------------------------------------------------------
@@ -22,6 +23,14 @@ api :: Proxy API
 api = Proxy
 ---------------------------------------------------------------
 -- | Client Handlers
+createUser :: LoginUser -> EitherT ServantError IO User
+todoGetAll :: AuthToken -> Maybe OrderBy -> Maybe Completed -> EitherT ServantError IO [Todo]
+todoGet    :: AuthToken -> TodoId -> EitherT ServantError IO (Maybe Todo)
+todoDelete :: AuthToken -> TodoId -> EitherT ServantError IO ()
+todoUpdate :: AuthToken -> TodoId -> NewTodo -> EitherT ServantError IO (Maybe Todo)
+todoCount  :: AuthToken -> EitherT ServantError IO TodoCount
+todoCreate :: AuthToken -> NewTodo -> EitherT ServantError IO Todo
+------------------------------------------------------------------------------
 createUser
      :<|> todoGetAll
      :<|> todoGet
@@ -66,6 +75,12 @@ todoWebTests = do
       Right () <- runEitherT $ todoDelete token todoId 
       Right (TodoCount count) <- runEitherT $ todoCount token
       count `shouldBe` 2
+   it "Should get a todo" $ do
+      Right User { token = token } <- makeUser
+      Right Todo{ todoId = todoId } <- runEitherT $ todoCreate token (NewTodo "walk dog twice")
+      x <- runEitherT $ todoGet token todoId
+      x `shouldSatisfy` isRight
+
 
 
    

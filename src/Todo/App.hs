@@ -41,6 +41,5 @@ app cfg = serve (Proxy :: Proxy API) server
                          . flip runReaderT cfg . runTodo
 
     errorToServantErr :: Error -> ServantErr
-    errorToServantErr = const err500 -- TODO: fill out
- 
-    
+    errorToServantErr = const err500
+

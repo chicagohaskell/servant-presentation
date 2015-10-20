@@ -7,14 +7,10 @@ module Todo.Type.Todo where
 import           Data.Aeson
 import           Data.Hashable
 import           Data.Text (Text)
-import qualified Data.Text as T
-import           Data.UUID (UUID)
-import qualified Data.UUID as UUID
 import qualified Data.UUID.V4 as UUID
 import           GHC.Generics
 import           Servant.Common.Text
 import           Test.QuickCheck
-import           Test.QuickCheck.Instances
 import           Todo.Type.UUID
 import           Todo.Type.User
 ------------------------------------------------------------------------------

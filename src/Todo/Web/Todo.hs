@@ -20,15 +20,9 @@ module Todo.Web.Todo
     ) where
 ------------------------------------------------------------------------------
 import           Servant
-import qualified Data.Text as T
-import           Data.Text    (Text)
 import           Servant.Server.Internal
 import           Control.Monad.Reader
 import qualified Data.Text.Encoding as T
-import qualified Data.Text as T
-import           Data.Text    (Text)
-import           Control.Monad.Except
-import           Control.Monad.Trans.Maybe
 import           Network.Wai.Internal
 import           Network.Wai
 import           Network.HTTP.Types
@@ -36,7 +30,6 @@ import           Servant.Client
 import           Servant.Mock
 import           Servant.Common.Req
 import qualified Web.JWT as JWT
-import           Servant.Common.Text
 ------------------------------------------------------------------------------
 import           Todo.Core
 import           Todo.Config
@@ -44,7 +37,7 @@ import           Todo.Type.Todo
 import           Todo.Type.User
 import           Todo.DB.Todo
 ------------------------------------------------------------------------------
--- | Comment API
+-- | Todo API
 type TodoAPI =
        AuthToken :> "todo" :> QueryParam "orderby" OrderBy :> QueryParam "completed" Completed :> Get '[JSON] [Todo]
   :<|> AuthToken :> "todo" :> Capture "id" TodoId :> Get '[JSON] (Maybe Todo)

@@ -5,9 +5,7 @@ module Todo.DB.Todo where
 
 import qualified Data.HashMap.Strict  as H
 import Control.Monad.IO.Class (MonadIO(liftIO))
-import Control.Monad.STM
 import Control.Concurrent.STM
-import Control.Monad
 import Test.QuickCheck.Arbitrary
 import Data.Maybe
 import Todo.Type.Todo

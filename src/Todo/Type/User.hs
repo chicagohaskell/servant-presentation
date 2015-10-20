@@ -4,13 +4,10 @@
 module Todo.Type.User where
 ------------------------------------------------------------------------------
 import           Data.Aeson
-import qualified Data.Text as T
 import           Data.Text    (Text)
 import           GHC.Generics
 import           Test.QuickCheck.Arbitrary
 import           Test.QuickCheck.Instances
-import           Control.Monad.IO.Class ( MonadIO(..) )
-import           Data.UUID (UUID)
 import           Data.Hashable
 import           Servant.Common.Text
 ------------------------------------------------------------------------------

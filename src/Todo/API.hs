@@ -14,7 +14,6 @@ import Servant
 import Todo.Core
 import Todo.Web.User
 import Todo.Web.Todo
-import Todo.Web.Docs
 ------------------------------------------------------------------------------
 type API = UserAPI :<|> TodoAPI
 ------------------------------------------------------------------------------

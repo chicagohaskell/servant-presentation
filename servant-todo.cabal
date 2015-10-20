@@ -78,7 +78,6 @@ library
     Todo.DB.Todo
     Todo.DB.User
     Todo.Web.Todo
-    Todo.Web.Docs
     Todo.Web.User
     Todo.Type.Todo
     Todo.Type.Error
