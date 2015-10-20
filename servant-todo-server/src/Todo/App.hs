@@ -28,15 +28,21 @@ import Todo.Config                 ( Config(..)  )
 import Todo.API
 import Todo.Core
 import Todo.Type.Error
+
+
+type APIEx = API :<|> "static" :> Raw
+
 ------------------------------------------------------------------------------
 -- | Application
 app :: Config -> Application
-app cfg = serve (Proxy :: Proxy API) server
+app cfg = serve (Proxy :: Proxy APIEx) server
   where
-    server :: Server API
-    server = enter todoToEither todoEndpoints
+    server :: Server APIEx
+    server = enter todoToEither todoEndpoints :<|> static
 
-    todoToEither :: TodoApp :~> EitherT ServantErr IO 
+    static = serveDirectory "static"
+
+    todoToEither :: TodoApp :~> EitherT ServantErr IO
     todoToEither = Nat $ flip bimapEitherT id errorToServantErr
                          . flip runReaderT cfg . runTodo
 

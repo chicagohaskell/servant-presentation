@@ -7,9 +7,8 @@ import           Control.Monad.IO.Class ( MonadIO(..) )
 import           System.Random
 import           Servant.Common.Text
 import           Test.QuickCheck
-import qualified Data.UUID as UUID
-import qualified Data.UUID.V4 as UUID
-import           Data.UUID (UUID)
+import qualified Data.UUID.Types as UUID
+import           Data.UUID.Types (UUID)
 import           Data.Hashable
 
 newtype TodoUUID = TodoUUID UUID
@@ -23,14 +22,14 @@ instance FromJSON TodoUUID where
     case fromText x :: Maybe TodoUUID of
       Nothing    -> typeMismatch "UUID" val
       Just vuuid -> pure vuuid
-  parseJSON x = typeMismatch "UUID" x  
+  parseJSON x = typeMismatch "UUID" x
 
 instance Arbitrary TodoUUID where
   arbitrary = do
     num <- choose (minBound, maxBound)
     let gen = mkStdGen num
         (uuid, _) = random gen
-    return $ TodoUUID uuid  
+    return $ TodoUUID uuid
 
 instance ToText TodoUUID where
   toText (TodoUUID x) = UUID.toText x
@@ -38,6 +37,5 @@ instance ToText TodoUUID where
 instance FromText TodoUUID where
   fromText x = TodoUUID <$> UUID.fromText x
 
-nextUUID :: MonadIO m => m TodoUUID
-nextUUID = TodoUUID <$> liftIO UUID.nextRandom
-
+-- nextUUID :: MonadIO m => m TodoUUID
+-- nextUUID = TodoUUID <$> liftIO UUID.nextRandom

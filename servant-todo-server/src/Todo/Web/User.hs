@@ -29,8 +29,8 @@ import qualified Data.Text as T
 import           Data.Text    (Text)
 import           Control.Monad.Except
 import           Control.Monad.Trans.Maybe
-import           Network.Wai.Internal
-import           Network.Wai
+-- import           Network.Wai.Internal
+-- import           Network.Wai
 import           Network.HTTP.Types
 import qualified Web.JWT as JWT
 ------------------------------------------------------------------------------
@@ -39,10 +39,7 @@ import           Todo.Config
 import           Todo.Type.Todo
 import           Todo.Type.User
 import           Todo.DB.User
-------------------------------------------------------------------------------
--- | Comment API
-type UserAPI = "user" :> ReqBody '[JSON] LoginUser :> Post '[JSON] User
-------------------------------------------------------------------------------
+
 userAPI :: ServerT UserAPI TodoApp
 userAPI user = getUser user =<< asks userdb
 

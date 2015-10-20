@@ -30,6 +30,7 @@ executable web
                      , servant-mock
                      , servant-server
                      , servant-docs
+                     , servant-todo-common
                      , QuickCheck
                      , quickcheck-instances
                      , text
@@ -60,6 +61,7 @@ library
                      , servant-client
                      , servant-server
                      , servant-docs
+                     , servant-todo-common
                      , QuickCheck
                      , quickcheck-instances
                      , http-types
@@ -80,10 +82,10 @@ library
     Todo.Web.Todo
     Todo.Web.Docs
     Todo.Web.User
-    Todo.Type.Todo
-    Todo.Type.Error
-    Todo.Type.User
-    Todo.Type.UUID
+--    Todo.Type.Todo
+--    Todo.Type.Error
+--    Todo.Type.User
+--    Todo.Type.UUID
 
 test-suite tests
     type:              exitcode-stdio-1.0

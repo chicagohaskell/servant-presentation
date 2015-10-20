@@ -1,6 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE DeriveGeneric              #-}
+{-# LANGUAGE TypeOperators       #-}
+{-# LANGUAGE DataKinds           #-}
 ------------------------------------------------------------------------------
 module Todo.Type.Todo where
 ------------------------------------------------------------------------------
@@ -8,15 +10,16 @@ import           Data.Aeson
 import           Data.Hashable
 import           Data.Text (Text)
 import qualified Data.Text as T
-import           Data.UUID (UUID)
-import qualified Data.UUID as UUID
-import qualified Data.UUID.V4 as UUID
+-- import           Data.UUID (UUID)
+-- import qualified Data.UUID as UUID
+-- import qualified Data.UUID.V4 as UUID
 import           GHC.Generics
 import           Servant.Common.Text
 import           Test.QuickCheck
 import           Test.QuickCheck.Instances
 import           Todo.Type.UUID
 import           Todo.Type.User
+import           Servant.API
 ------------------------------------------------------------------------------
 newtype Created = Created Integer
    deriving (Show, Eq, ToJSON, FromJSON, Arbitrary)
@@ -71,3 +74,13 @@ instance Arbitrary Todo where
 
 instance ToJSON Todo
 instance FromJSON Todo
+
+------------------------------------------------------------------------------
+-- | Comment API
+type TodoAPI =
+       AuthToken :> "todo" :> QueryParam "orderby" OrderBy :> QueryParam "completed" Completed :> Get '[JSON] [Todo]
+  :<|> AuthToken :> "todo" :> Capture "id" TodoId :> Get '[JSON] (Maybe Todo)
+  :<|> AuthToken :> "todo" :> Capture "id" TodoId :> Delete '[JSON] ()
+  :<|> AuthToken :> "todo" :> Capture "id" TodoId :> ReqBody '[JSON] NewTodo :> Put '[JSON] (Maybe Todo)
+  :<|> AuthToken :> "todo" :> "count" :> Get '[JSON] TodoCount
+  :<|> AuthToken :> "todo" :> ReqBody '[JSON] NewTodo :> Post '[JSON] Todo

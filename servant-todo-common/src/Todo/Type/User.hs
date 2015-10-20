@@ -1,5 +1,7 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
+{-# LANGUAGE TypeOperators       #-}
+{-# LANGUAGE DataKinds #-}
 ------------------------------------------------------------------------------
 module Todo.Type.User where
 ------------------------------------------------------------------------------
@@ -10,9 +12,10 @@ import           GHC.Generics
 import           Test.QuickCheck.Arbitrary
 import           Test.QuickCheck.Instances
 import           Control.Monad.IO.Class ( MonadIO(..) )
-import           Data.UUID (UUID)
+import           Data.UUID.Types (UUID)
 import           Data.Hashable
 import           Servant.Common.Text
+import           Servant.API
 ------------------------------------------------------------------------------
 import           Todo.Type.UUID
 ------------------------------------------------------------------------------
@@ -48,3 +51,8 @@ instance FromJSON User
 ------------------------------------------------------------------------------
 instance Arbitrary User where
   arbitrary = User <$> arbitrary <*> arbitrary <*> arbitrary <*> arbitrary
+
+------------------------------------------------------------------------------
+-- | Comment API
+type UserAPI = "user" :> ReqBody '[JSON] LoginUser :> Post '[JSON] User
+------------------------------------------------------------------------------

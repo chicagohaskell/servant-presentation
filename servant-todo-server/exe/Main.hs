@@ -18,6 +18,7 @@ import Servant.Mock
 import Data.Proxy
 import System.Envy
 import Network.Wai.Handler.Warp             ( run )
+
 ------------------------------------------------------------------------------
 -- | Application Entry Point
 main :: IO ()

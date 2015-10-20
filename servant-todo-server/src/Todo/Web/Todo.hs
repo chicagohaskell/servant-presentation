@@ -40,18 +40,10 @@ import           Servant.Common.Text
 ------------------------------------------------------------------------------
 import           Todo.Core
 import           Todo.Config
+import           Todo.Type.API
 import           Todo.Type.Todo
 import           Todo.Type.User
 import           Todo.DB.Todo
-------------------------------------------------------------------------------
--- | Comment API
-type TodoAPI =
-       AuthToken :> "todo" :> QueryParam "orderby" OrderBy :> QueryParam "completed" Completed :> Get '[JSON] [Todo]
-  :<|> AuthToken :> "todo" :> Capture "id" TodoId :> Get '[JSON] (Maybe Todo)
-  :<|> AuthToken :> "todo" :> Capture "id" TodoId :> Delete '[JSON] ()
-  :<|> AuthToken :> "todo" :> Capture "id" TodoId :> ReqBody '[JSON] NewTodo :> Put '[JSON] (Maybe Todo)
-  :<|> AuthToken :> "todo" :> "count" :> Get '[JSON] TodoCount
-  :<|> AuthToken :> "todo" :> ReqBody '[JSON] NewTodo :> Post '[JSON] Todo
 
 ------------------------------------------------------------------------------
 todoAPI :: ServerT TodoAPI TodoApp
@@ -86,7 +78,7 @@ todoUpdate uid todoid newtodo = updateTodo uid todoid newtodo =<< asks tododb
 instance HasClient api => HasClient (AuthToken :> api) where
   type Client (AuthToken :> api) = AuthToken -> Client api
   clientWithRoute Proxy req url (AuthToken txt) =
-    clientWithRoute (Proxy :: Proxy api) newreq url 
+    clientWithRoute (Proxy :: Proxy api) newreq url
       where
         newreq = req { headers = [("X-Access-Token", txt)] ++ (headers req) }
 
