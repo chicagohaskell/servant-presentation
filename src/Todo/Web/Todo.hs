@@ -39,12 +39,12 @@ import           Todo.DB.Todo
 ------------------------------------------------------------------------------
 -- | Todo API
 type TodoAPI =
-       AuthToken :> "todo" :> QueryParam "orderby" OrderBy :> QueryParam "completed" Completed :> Get '[JSON] [Todo]
-  :<|> AuthToken :> "todo" :> Capture "id" TodoId :> Get '[JSON] (Maybe Todo)
-  :<|> AuthToken :> "todo" :> Capture "id" TodoId :> Delete '[JSON] ()
-  :<|> AuthToken :> "todo" :> Capture "id" TodoId :> ReqBody '[JSON] NewTodo :> Put '[JSON] (Maybe Todo)
-  :<|> AuthToken :> "todo" :> "count" :> Get '[JSON] TodoCount
-  :<|> AuthToken :> "todo" :> ReqBody '[JSON] NewTodo :> Post '[JSON] Todo
+       "todo" :> AuthToken :> QueryParam "orderby" OrderBy :> QueryParam "completed" Completed :> Get '[JSON] [Todo]
+  :<|> "todo" :> AuthToken :> Capture "id" TodoId :> Get '[JSON] (Maybe Todo)
+  :<|> "todo" :> AuthToken :> Capture "id" TodoId :> Delete '[JSON] ()
+  :<|> "todo" :> AuthToken :> Capture "id" TodoId :> ReqBody '[JSON] NewTodo :> Put '[JSON] (Maybe Todo)
+  :<|> "todo" :> AuthToken :> "count" :> Get '[JSON] TodoCount
+  :<|> "todo" :> AuthToken :> ReqBody '[JSON] NewTodo :> Post '[JSON] Todo
 
 ------------------------------------------------------------------------------
 todoAPI :: ServerT TodoAPI TodoApp
