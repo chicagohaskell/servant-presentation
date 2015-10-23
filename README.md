@@ -1,2 +1,3 @@
-# servant-todo
+servant-todo
+================
 Todo app for servant
